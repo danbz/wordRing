@@ -4,6 +4,7 @@
 
 #include "ofMain.h"
 #include "ofxDOF.h"
+#include "ofxMacScreenRecorder.h"
 
 // ---------------------------------------------
 class LyricWord {
@@ -60,5 +61,10 @@ public:
     int focalDist, focalRange;
     
     ofxDOF depthOfField;
+    
+    ofxMacScreenRecorder recorder;
+    ofxMacScreenRecorderSetting recorderSetting;
+    
+    
 
 };

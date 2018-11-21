@@ -34,6 +34,12 @@ void ofApp::setup() {
     focalRange = 50;
     //cout << "focal dist: " << depthOfField.getFocalDistance() << " focal range: " << depthOfField.getFocalRange() << endl;
     
+    
+    ofxMacScreenRecorderSetting setting;
+    setting.recordingArea.set(0, 0, ofGetWidth(), ofGetHeight());
+    setting.frameRate = 60.0f;
+    recorder.setup(setting);
+    
 }
 
 //--------------------------------------------------------------
@@ -44,8 +50,9 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
     ofSetBackgroundColor(0);
-    
-    
+    float scl = 1;
+    float radius = 350;
+
     depthOfField.begin();
    // cam.begin();
     cam.begin(depthOfField.getDimensions());
@@ -54,7 +61,6 @@ void ofApp::draw() {
     ofSetColor(255,0,0); // set the color to red to draw the first word
     
     
-    float radius = 350;
     
     for(unsigned int i=0; i<words.size()/2; i++) {
         float t = -HALF_PI + ofMap(i, 0, (words.size()/2), 0, TWO_PI);
@@ -67,10 +73,8 @@ void ofApp::draw() {
         // use autorotate counter to rotate in z and y axes
         ofRotateZDeg(autoRotateDeg*2.0); // autorotate the word circle
         ofRotateYDeg(autoRotateDeg); // autorotate the word circle
-        
         ofTranslate(x, y );
         ofRotateZDeg(a );
-        float scl = 1;
         glScalef(scl, scl, scl);
         font.drawString(words[i].word, 0, 20);
         ofPopMatrix();
@@ -80,12 +84,11 @@ void ofApp::draw() {
     
     ofSetColor(100);
     font.drawString(sortTypeInfo, -(font.stringWidth(sortTypeInfo)/2), 0);
-    
+
     ofPopMatrix();
     //ofPopStyle();
     cam.end();
     depthOfField.end();
-    
     
     // if we are using autorotate then increment the amount to rotate by
     if (b_autoRotate){
@@ -199,6 +202,11 @@ void ofApp::keyPressed  (int key){
         case OF_KEY_LEFT:
             if (focalRange>0) focalRange-=1;
             depthOfField.setFocalRange( focalRange );
+            break;
+            
+        case 'v':
+            if(recorder.isRecordingNow()) recorder.stop();
+            else recorder.start(ofToDataPath("test")); // not need extension.
             break;
             
         default:
