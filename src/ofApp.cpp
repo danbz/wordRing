@@ -5,15 +5,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    
-    //ofTrueTypeFont::setGlobalDpi(96);
-    
     // load the font
-    //font.load("sans-serif", 18);
+    // font.load("sans-serif", 18);
     font.load("monospace", 18);
-    font.setGlobalDpi(144);
-    //font.load("sans-serif", 18); // use different typefaces
+    // font.load("sans-serif", 18); // use different typefaces
     
+    font.setGlobalDpi(144);
     sortTypeInfo = "no sort";
     
     // load the txt document into a ofBuffer
@@ -31,7 +28,12 @@ void ofApp::setup() {
     b_autoRotate = false;
     b_showGui = false;
     
+    // set DOF parameters
     depthOfField.setup(ofGetWidth(), ofGetHeight());
+    focalDist = 150;
+    focalRange = 50;
+    //cout << "focal dist: " << depthOfField.getFocalDistance() << " focal range: " << depthOfField.getFocalRange() << endl;
+    
 }
 
 //--------------------------------------------------------------
@@ -104,73 +106,103 @@ void ofApp::draw() {
     // instruction
     ofSetColor(200);
     if (b_showGui){
-        ofDrawBitmapString("\nPress 1 for no sort\nPress 2 for alphabetical\nPress 3 for word length\nPress 4 for word occurrence\nr to autorotate\nw to load text from the web\nl to load a txt file form disk \nf for fullscreen", 20, 20);
+        ofDrawBitmapString("\nPress 1 for no sort\nPress 2 for alphabetical\nPress 3 for word length\nPress 4 for word occurrence\nr to autorotate\nw to load text from the web\nl to load a txt file form disk \nf for fullscreen \nfocalDistance: " + ofToString( focalDist ) + " focalRange: " + ofToString( focalRange ) , 20, 20);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed  (int key){
     
-    // sort raw
-    if(key == '1')     {
-        sortTypeInfo = "no sort";
-        // setup();
-    }
+    ofFileDialogResult openFileResult;
+    ofHttpResponse loadResult;
     
-    // sort alphabetically
-    if(key == '2') {
-        sortTypeInfo = "sorting alphabetically";
-        ofSort(words, ofApp::sortOnABC);
-    }
-    
-    // sort by length of word
-    if(key == '3')     {
-        sortTypeInfo = "sorting on word length";
-        ofSort(words, ofApp::sortOnLength);
-    }
-    
-    // sort by length of word
-    if(key == '4')     {
-        sortTypeInfo = "sorting on word occurrences";
-        ofSort(words, ofApp::sortOnOccurrences);
-    }
-    
-    if (key == 'l'){
-        
-        //Open the Open File Dialog to load text file
-        ofFileDialogResult openFileResult= ofSystemLoadDialog("Select a txt file");
-        
-        //Check if the user opened a file
-        if (openFileResult.bSuccess){
+    switch (key) {
+        case '1':
+            // sort raw
+            sortTypeInfo = "no sort";
+            break;
+        case '2':
+            // sort alphabetically
+
+            sortTypeInfo = "sorting alphabetically";
+            ofSort(words, ofApp::sortOnABC);
+            break;
             
-            ofLogVerbose("User selected a file");
+        case '3':
+            // sort by length of word
+            sortTypeInfo = "sorting on word length";
+            ofSort(words, ofApp::sortOnLength);
+            break;
             
-            //We have a file, check it and process it
-            processOpenFileSelection(openFileResult);
+        case '4':
+            // sort by length of word
+            sortTypeInfo = "sorting on word occurrences";
+            ofSort(words, ofApp::sortOnOccurrences);
+            break;
             
-        }else {
-            ofLogVerbose("User hit cancel");
-        }
-    }
-    
-    if (key == 'w'){
-        ofHttpResponse loadResult = ofLoadURL("http://www.google.com/robots.txt");
-        cout << "my awesome loadresult: " << endl;
-        // cout << "my awesome loadresult: " << ofToString( loadResult.data) << endl;
-        
-        urlResponse(loadResult);
-    }
-    
-    
-    if (key == 'r'){
-        b_autoRotate=!b_autoRotate;
-    }
-    if (key == 'f'){
-        ofToggleFullscreen();
-        depthOfField.setup(ofGetWidth(), ofGetHeight());
-    }
-    if (key == 'g'){
-        b_showGui =!b_showGui;
+        case 'l':
+            
+            //Open the Open File Dialog to load text file
+            openFileResult = ofSystemLoadDialog("Select a txt file");
+            
+            //Check if the user opened a file
+            if (openFileResult.bSuccess){
+
+                ofLogVerbose("User selected a file");
+
+                //We have a file, check it and process it
+                processOpenFileSelection(openFileResult);
+
+            }else {
+                ofLogVerbose("User hit cancel");
+            }
+            
+            break;
+            
+        case 'w':
+            
+            loadResult = ofLoadURL("http://www.google.com/robots.txt");
+            cout << "my awesome loadresult: " << endl;
+            // cout << "my awesome loadresult: " << ofToString( loadResult.data) << endl;
+            
+            urlResponse(loadResult);
+            break;
+            
+        case 'r':
+            b_autoRotate=!b_autoRotate;
+            break;
+            
+        case 'f':
+            ofToggleFullscreen();
+            depthOfField.setup(ofGetWidth(), ofGetHeight());
+            break;
+            
+        case 'g':
+            b_showGui =!b_showGui;
+            break;
+            
+        case OF_KEY_UP:
+            focalDist +=1;
+            depthOfField.setFocalDistance(focalDist);
+            break;
+            
+        case OF_KEY_DOWN:
+            if (focalDist>0) focalDist -=1;
+            depthOfField.setFocalDistance(focalDist);
+            break;
+            
+        case OF_KEY_RIGHT:
+            focalRange+=1;
+            depthOfField.setFocalRange( focalRange );
+            break;
+            
+        case OF_KEY_LEFT:
+            if (focalRange>0) focalRange-=1;
+            depthOfField.setFocalRange( focalRange );
+            break;
+            
+        default:
+            break;
     }
 }
 

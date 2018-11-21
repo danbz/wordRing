@@ -57,6 +57,7 @@ public:
     float autoRotateDeg, rotateStep;
     bool b_autoRotate, b_showGui;
     
+    int focalDist, focalRange;
     
     ofxDOF depthOfField;
 
