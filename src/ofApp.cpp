@@ -37,9 +37,13 @@ void ofApp::setup() {
     
     ofxMacScreenRecorderSetting setting;
     setting.recordingArea.set(0, 0, ofGetWidth(), ofGetHeight());
-    setting.frameRate = 60.0f;
+    setting.frameRate = 30.0f;
     recorder.setup(setting);
     
+     scl = 1;
+     radius = 350;
+    ofSetBackgroundColor(0);
+
 }
 
 //--------------------------------------------------------------
@@ -49,10 +53,7 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-    ofSetBackgroundColor(0);
-    float scl = 1;
-    float radius = 350;
-
+   
     depthOfField.begin();
    // cam.begin();
     cam.begin(depthOfField.getDimensions());
@@ -60,12 +61,10 @@ void ofApp::draw() {
     ofPushMatrix();
     ofSetColor(255,0,0); // set the color to red to draw the first word
     
-    
-    
     for(unsigned int i=0; i<words.size()/2; i++) {
         float t = -HALF_PI + ofMap(i, 0, (words.size()/2), 0, TWO_PI);
-        float x = cos( t ) * radius;
-        float y = sin( t ) * radius;
+        float x = cos( t*2 ) * radius;
+        float y = sin( t*2 ) * radius;
         float a = ofRadToDeg(atan2(y, x));
         
         ofPushMatrix();
@@ -73,13 +72,14 @@ void ofApp::draw() {
         // use autorotate counter to rotate in z and y axes
         ofRotateZDeg(autoRotateDeg*2.0); // autorotate the word circle
         ofRotateYDeg(autoRotateDeg); // autorotate the word circle
-        ofTranslate(x, y );
+        ofTranslate(x, y, i*2 );
         ofRotateZDeg(a );
         glScalef(scl, scl, scl);
         font.drawString(words[i].word, 0, 20);
         ofPopMatrix();
         
         ofSetColor(255); // set all the rest of the words to white
+       // radius +=1;
     }
     
     ofSetColor(100);

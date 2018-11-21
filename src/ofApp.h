@@ -50,13 +50,11 @@ public:
     void processOpenFileSelection(ofFileDialogResult openFileResult);
     string originalFileExtension;
     
-    
     void urlResponse(ofHttpResponse & response);
-    bool loading;
     
     ofEasyCam cam;
-    float autoRotateDeg, rotateStep;
-    bool b_autoRotate, b_showGui;
+    float autoRotateDeg, rotateStep, scl, radius;
+    bool b_autoRotate, b_showGui, loading;
     
     int focalDist, focalRange;
     
@@ -65,6 +63,4 @@ public:
     ofxMacScreenRecorder recorder;
     ofxMacScreenRecorderSetting recorderSetting;
     
-    
-
 };
