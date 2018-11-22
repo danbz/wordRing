@@ -15,3 +15,6 @@ Instructions for use:
 
 
 ![screenshot](wordring.png)
+
+![screenshot](test-spiral.jpg)
+
