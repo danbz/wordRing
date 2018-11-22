@@ -10,11 +10,13 @@ Instructions for use:
 * press ```w``` to load a txt file from the web at a remote url
 * press ```b``` to autorotate the circle in 3d
 * press ```f``` to toggle fullscreen display
+* press up to increase focal distance
+* press down to decrease focal distance
+* press right to increase depth of field
+* press left to decrease depth of field
 
 ### Other classes used in this file
 
-
-![screenshot](wordring.png)
-
 ![screenshot](text-spiral.jpg)
 
+![screenshot](wordring.png)
