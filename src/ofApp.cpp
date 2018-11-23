@@ -40,10 +40,12 @@ void ofApp::setup() {
     setting.frameRate = 30.0f;
     recorder.setup(setting);
     
-     scl = 1;
-     radius = 350;
+    scl = 1;
+    radius = 350;
+    twists = 3; // number of twists in the spiral
+    spiralOffset = 2;
     ofSetBackgroundColor(0);
-
+    
 }
 
 //--------------------------------------------------------------
@@ -53,18 +55,19 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-   
+    
     depthOfField.begin();
-   // cam.begin();
+    // cam.begin();
     cam.begin(depthOfField.getDimensions());
     //ofPushStyle();
     ofPushMatrix();
     ofSetColor(255,0,0); // set the color to red to draw the first word
-    
+    float centreOffset = words.size()/2 ; // calculte the height of the spiral of words
+    ofTranslate(0,0, -(centreOffset*spiralOffset)/2);
     for(unsigned int i=0; i<words.size()/2; i++) {
         float t = -HALF_PI + ofMap(i, 0, (words.size()/2), 0, TWO_PI);
-        float x = cos( t*2 ) * radius;
-        float y = sin( t*2 ) * radius;
+        float x = cos( t*twists ) * radius;
+        float y = sin( t*twists ) * radius;
         float a = ofRadToDeg(atan2(y, x));
         
         ofPushMatrix();
@@ -72,19 +75,20 @@ void ofApp::draw() {
         // use autorotate counter to rotate in z and y axes
         ofRotateZDeg(autoRotateDeg*2.0); // autorotate the word circle
         ofRotateYDeg(autoRotateDeg); // autorotate the word circle
-        ofTranslate(x, y, i*2 );
+        
+        ofTranslate(x, y, i*spiralOffset);
         ofRotateZDeg(a );
         glScalef(scl, scl, scl);
         font.drawString(words[i].word, 0, 20);
         ofPopMatrix();
         
         ofSetColor(255); // set all the rest of the words to white
-       // radius +=1;
+        // radius +=1;
     }
     
     ofSetColor(100);
     font.drawString(sortTypeInfo, -(font.stringWidth(sortTypeInfo)/2), 0);
-
+    
     ofPopMatrix();
     //ofPopStyle();
     cam.end();
@@ -126,7 +130,7 @@ void ofApp::keyPressed  (int key){
             break;
         case '2':
             // sort alphabetically
-
+            
             sortTypeInfo = "sorting alphabetically";
             ofSort(words, ofApp::sortOnABC);
             break;
@@ -150,12 +154,12 @@ void ofApp::keyPressed  (int key){
             
             //Check if the user opened a file
             if (openFileResult.bSuccess){
-
+                
                 ofLogVerbose("User selected a file");
-
+                
                 //We have a file, check it and process it
                 processOpenFileSelection(openFileResult);
-
+                
             }else {
                 ofLogVerbose("User hit cancel");
             }
@@ -185,22 +189,22 @@ void ofApp::keyPressed  (int key){
             break;
             
         case OF_KEY_UP:
-            focalDist +=1;
+            focalDist +=10;
             depthOfField.setFocalDistance(focalDist);
             break;
             
         case OF_KEY_DOWN:
-            if (focalDist>0) focalDist -=1;
+            if (focalDist>10) focalDist -=10;
             depthOfField.setFocalDistance(focalDist);
             break;
             
         case OF_KEY_RIGHT:
-            focalRange+=1;
+            focalRange+=10;
             depthOfField.setFocalRange( focalRange );
             break;
             
         case OF_KEY_LEFT:
-            if (focalRange>0) focalRange-=1;
+            if (focalRange>10) focalRange-=10;
             depthOfField.setFocalRange( focalRange );
             break;
             
@@ -209,6 +213,28 @@ void ofApp::keyPressed  (int key){
             else recorder.start(ofToDataPath("test")); // not need extension.
             break;
             
+        case '=':
+        case '+':
+            spiralOffset+=1;
+            break;
+            
+        case '-':
+        case '_':
+            if (spiralOffset>0){
+                spiralOffset-=1;
+            }
+            break;
+            
+        case '.':
+        case '>':
+            twists+=0.25;
+            break;
+        case ',':
+        case '<':
+            if (twists >1){
+                twists -=0.25;
+            }
+            break;
         default:
             break;
     }

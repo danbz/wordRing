@@ -63,4 +63,7 @@ public:
     ofxMacScreenRecorder recorder;
     ofxMacScreenRecorderSetting recorderSetting;
     
+    int  spiralOffset;
+    float twists;
+    
 };
