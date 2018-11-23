@@ -6,11 +6,12 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
     // load the font
-    // font.load("sans-serif", 18);
-    font.load("monospace", 18);
-    // font.load("sans-serif", 18); // use different typefaces
+   //  font.load("sans-serif", 18);
+    font.load("American Typewriter",18);
+   // font.load("monospace", 18);
+    // font.load("serif", 18); // use different typefaces
     
-    font.setGlobalDpi(144);
+    font.setGlobalDpi(96);
     sortTypeInfo = "no sort";
     
     // load the txt document into a ofBuffer
@@ -30,16 +31,14 @@ void ofApp::setup() {
     
     // set DOF parameters
     depthOfField.setup(ofGetWidth(), ofGetHeight());
-    focalDist = 150;
-    focalRange = 50;
-    //cout << "focal dist: " << depthOfField.getFocalDistance() << " focal range: " << depthOfField.getFocalRange() << endl;
-    
+    focalDist = 200;
+    focalRange = 200;
     
     ofxMacScreenRecorderSetting setting;
     setting.recordingArea.set(0, 0, ofGetWidth(), ofGetHeight());
-    setting.frameRate = 30.0f;
+    setting.frameRate = 60.0f;
     recorder.setup(setting);
-    
+    ofSetFrameRate(60);
     scl = 1;
     radius = 350;
     twists = 3; // number of twists in the spiral
@@ -60,10 +59,15 @@ void ofApp::draw() {
     // cam.begin();
     cam.begin(depthOfField.getDimensions());
     //ofPushStyle();
+    // use autorotate counter to rotate in z and y axes
+
+    ofRotateZDeg(autoRotateDeg*2.0); // autorotate the word circle
+    ofRotateYDeg(autoRotateDeg); // autorotate the word circle
     ofPushMatrix();
     ofSetColor(255,0,0); // set the color to red to draw the first word
     float centreOffset = words.size()/2 ; // calculte the height of the spiral of words
-    ofTranslate(0,0, -(centreOffset*spiralOffset)/2);
+    ofTranslate(0,0, -(centreOffset*spiralOffset)/2); // centre the pivot in the spiral height
+    
     for(unsigned int i=0; i<words.size()/2; i++) {
         float t = -HALF_PI + ofMap(i, 0, (words.size()/2), 0, TWO_PI);
         float x = cos( t*twists ) * radius;
@@ -72,24 +76,21 @@ void ofApp::draw() {
         
         ofPushMatrix();
         
-        // use autorotate counter to rotate in z and y axes
-        ofRotateZDeg(autoRotateDeg*2.0); // autorotate the word circle
-        ofRotateYDeg(autoRotateDeg); // autorotate the word circle
-        
         ofTranslate(x, y, i*spiralOffset);
         ofRotateZDeg(a );
         glScalef(scl, scl, scl);
         font.drawString(words[i].word, 0, 20);
+        //font.drawStringAsShapes(words[i].word, 0, 20);
         ofPopMatrix();
         
         ofSetColor(255); // set all the rest of the words to white
-        // radius +=1;
     }
-    
-    ofSetColor(100);
-    font.drawString(sortTypeInfo, -(font.stringWidth(sortTypeInfo)/2), 0);
+//
+//    ofSetColor(100);
+//    font.drawString(sortTypeInfo, -(font.stringWidth(sortTypeInfo)/2), 0);
     
     ofPopMatrix();
+    
     //ofPopStyle();
     cam.end();
     depthOfField.end();
@@ -113,7 +114,7 @@ void ofApp::draw() {
     // instruction
     ofSetColor(200);
     if (b_showGui){
-        ofDrawBitmapString("\nPress 1 for no sort\nPress 2 for alphabetical\nPress 3 for word length\nPress 4 for word occurrence\nr to autorotate\nw to load text from the web\nl to load a txt file form disk \nf for fullscreen \nfocalDistance: " + ofToString( focalDist ) + " focalRange: " + ofToString( focalRange ) , 20, 20);
+        ofDrawBitmapString("\nPress 1 for no sort\nPress 2 for alphabetical\nPress 3 for word length\nPress 4 for word occurrence\nr to autorotate\nw to load text from the web\nl to load a txt file form disk \nf for fullscreen \nfocalDistance: " + ofToString( focalDist ) + " focalRange: " + ofToString( focalRange ) + "\nFPS: " + ofToString( ofGetFrameRate() ), 20, 20);
     }
 }
 
@@ -209,8 +210,11 @@ void ofApp::keyPressed  (int key){
             break;
             
         case 'v':
-            if(recorder.isRecordingNow()) recorder.stop();
-            else recorder.start(ofToDataPath("test")); // not need extension.
+            if(recorder.isRecordingNow()){
+              recorder.stop();
+            } else {
+                recorder.start(ofToDataPath("test"));
+            } // not need extension.
             break;
             
         case '=':
